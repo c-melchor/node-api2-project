@@ -75,4 +75,19 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  const deleted = await Posts.remove(id);
+
+  if (deleted) {
+    res.status(200).json(deleted);
+  } else {
+    try {
+      res.status(404).json({ message: "The adopter could not be found" });
+    } catch (error) {
+      res.status(500).json({ errorMessage: "Error removing the adopter" });
+    }
+  }
+});
+
 module.exports = router;
