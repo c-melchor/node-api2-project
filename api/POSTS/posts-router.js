@@ -2,14 +2,15 @@ const express = require("express");
 const Posts = require("../db-helpers");
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  Posts.find()
-    .then(posts => {
-      res.status(200).json(posts);
-    })
-    .catch(error => {
+router.get("/", async (req, res) => {
+  const post = await Posts.find();
+  if (post) {
+    try {
+      res.status(200).json(post);
+    } catch (error) {
       res.status(500).json({ message: error.message });
-    });
+    }
+  }
 });
 
 router.get("/:id", (req, res) => {
@@ -17,7 +18,13 @@ router.get("/:id", (req, res) => {
 
   Posts.findById(id)
     .then(post => {
-      res.status(200).json(post);
+      if (post.length) {
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({
+          errorMessage: "The user with the specified ID does not exist."
+        });
+      }
     })
     .catch(error => {
       res.status(500).json({ message: error.message });
@@ -67,16 +74,5 @@ router.put("/:id", async (req, res) => {
     }
   }
 });
-
-//   Posts.update()
-//     .then(postUpdate => {
-//       res.status(202).json(postUpdate);
-//     })
-//     .catch(error => {
-//       res
-//         .status(500)
-//         .json({ error: "The post information could not be modified." });
-//     });
-// });
 
 module.exports = router;
